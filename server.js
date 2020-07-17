@@ -16,7 +16,7 @@ app.get("/", function (req, res) {
   res.send("Hotel booking server.  Ask for /bookings, etc.");
 });
 
-// get bookings
+// get all bookings
 app.get("/bookings", function (req, res) {
   res.json(bookings);
 });
@@ -41,17 +41,33 @@ app.post("/bookings", (req, res) => {
     bookings.push(req.body);
     res.send({ success: true, bookings });
   } else {
-    res.status(400).send("Please fill the form: title, first name, surname, room id and email are mandatory");
+    res
+      .status(400)
+      .send(
+        "Please fill the form: title, first name, surname, room id and email are mandatory"
+      );
   }
 });
 
 // Delete a booking, specified by an ID
-app.delete("/bookings/:id",(req,res)=>{
+app.delete("/bookings/:id", (req, res) => {
   const bookingId = Number(req.params.id);
-  bookings = bookings.filter((booking)=>booking.id != bookingId)
-res.send({ success: true });
+  bookings = bookings.filter((booking) => booking.id != bookingId);
+  res.send({ success: true });
 });
 
+//search Date
+app.get("/bookings/search", (req, res) => {
+  const searchDate = moment(req.query.date);
+  if (searchDate) {
+    const findBooking = bookings.find(
+      (item) => item.checkInDate === searchDate
+    );
+    res.send(findBooking);
+  } else {
+    res.send(404, "No booking found");
+  }
+});
 const PORT = process.env.PORT || 5000;
 
 const listener = app.listen(PORT, function () {
